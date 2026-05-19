@@ -1,6 +1,7 @@
-const { app, BrowserWindow, Tray, Menu, screen, ipcMain, nativeImage } = require('electron');
+const { app, BrowserWindow, Tray, Menu, screen, ipcMain, nativeImage, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { autoUpdater } = require('electron-updater');
 
 let petWindow;
 let scheduleWindow;
@@ -303,11 +304,40 @@ ipcMain.handle('mark-task-shown', (_, id) => {
   }
 });
 
+// ── 자동 업데이트
+function setupAutoUpdater() {
+  autoUpdater.autoDownload = false; // 사용자 확인 후 다운로드
+
+  autoUpdater.on('update-available', (info) => {
+    if (petWindow) petWindow.webContents.send('update-available', info.version);
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    if (petWindow) petWindow.webContents.send('update-downloaded');
+  });
+
+  autoUpdater.on('error', (err) => {
+    console.error('[updater]', err.message);
+  });
+
+  // 앱 시작 후 5초 뒤 체크 (창 로딩 완료 대기)
+  setTimeout(() => autoUpdater.checkForUpdates(), 5000);
+}
+
+ipcMain.on('start-update-download', () => {
+  autoUpdater.downloadUpdate();
+});
+
+ipcMain.on('install-update', () => {
+  autoUpdater.quitAndInstall();
+});
+
 // ── 앱 시작
 app.whenReady().then(() => {
   createPetWindow();
   createTray();
   if (settings.showTower !== false) createTowerWindow();
+  if (app.isPackaged) setupAutoUpdater(); // 개발 환경에서는 비활성화
 });
 
 app.on('window-all-closed', (e) => e.preventDefault());

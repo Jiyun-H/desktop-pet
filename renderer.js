@@ -114,7 +114,9 @@ function showBubble(text, duration = 2500) {
   bubble.textContent = text;
   bubble.classList.add("show");
   clearTimeout(bubbleTimer);
-  bubbleTimer = setTimeout(() => bubble.classList.remove("show"), duration);
+  if (duration > 0) {
+    bubbleTimer = setTimeout(() => bubble.classList.remove("show"), duration);
+  }
 }
 
 async function getPos() {
@@ -417,6 +419,25 @@ document.addEventListener("visibilitychange", () => {
     loopActive = true;
     gameLoop();
   }
+});
+
+// ── 자동 업데이트
+let updateReady = false;
+
+ipcRenderer.on("update-available", (_, version) => {
+  showBubble(`v${version} 업데이트가 있다냥! 클릭해서 받아냥 🐾`, 10000);
+  updateReady = false;
+  // 10초 후 자동으로 다운로드 시작
+  setTimeout(() => ipcRenderer.send("start-update-download"), 10000);
+});
+
+ipcRenderer.on("update-downloaded", () => {
+  updateReady = true;
+  showBubble("다운로드 완료냥! 클릭하면 재시작할게냥 ✨", 0); // 0 = 클릭 전까지 유지
+});
+
+canvas.addEventListener("click", () => {
+  if (updateReady) ipcRenderer.send("install-update");
 });
 
 // 시작은 get-settings 응답 후 loadSprites 콜백에서 처리됨 (상단 참조)
