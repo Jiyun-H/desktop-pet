@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: transparent;
+        overflow: hidden;
+        width: 200px;
+        height: 200px;
+        cursor: pointer;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      #pet-container {
+        position: relative;
+        width: 200px;
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
+      /* Speech bubble */
+      #bubble {
+        position: absolute;
+        bottom: 78px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #fff;
+        border: 3px solid #333;
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 11px;
+        font-family: -apple-system, sans-serif;
+        white-space: normal;
+        word-break: keep-all;
+        max-width: 175px;
+        min-width: 60px;
+        width: max-content;
+        text-align: center;
+        line-height: 1.5;
+        display: none;
+        z-index: 10;
+        color: #333;
+        box-shadow: 3px 3px 0 #333;
+      }
+      #bubble::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: #333;
+      }
+      #bubble.show {
+        display: block;
+      }
+
+      /* Pixel art cat drawn with CSS */
+      #cat {
+        position: relative;
+        image-rendering: pixelated;
+        transform: scale(2);
+        transform-origin: bottom center;
+        margin-bottom: 8px;
+        cursor: grab;
+      }
+      #cat:active { cursor: grabbing; }
+
+      canvas {
+        image-rendering: pixelated;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="pet-container">
+      <div id="bubble"></div>
+      <canvas id="cat" width="32" height="32"></canvas>
+    </div>
+    <script src="renderer.js"></script>
+  </body>
+</html>

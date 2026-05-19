@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { margin: 0; padding: 0; }
+    body {
+      background: transparent;
+      overflow: hidden;
+      width: 64px;
+      height: 64px;
+      cursor: grab;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    canvas {
+      image-rendering: pixelated;
+      display: block;
+    }
+    body:active { cursor: grabbing; }
+  </style>
+</head>
+<body>
+  <canvas id="tower" width="64" height="64"></canvas>
+  <script src="tower.js"></script>
+</body>
+</html>

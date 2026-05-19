@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      background: #fff;
+      width: 300px;
+      border-radius: 12px;
+      overflow: hidden;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    header {
+      background: #F5AC6E;
+      padding: 13px 16px;
+      font-weight: 700;
+      font-size: 13px;
+      color: #fff;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      -webkit-app-region: drag; /* 헤더 드래그로 창 이동 */
+      cursor: move;
+    }
+    header span { font-size: 16px; }
+    #close-btn {
+      margin-left: auto;
+      background: rgba(255,255,255,0.25);
+      border: none;
+      color: #fff;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      -webkit-app-region: no-drag; /* 버튼은 드래그 제외 */
+    }
+    #close-btn:hover { background: rgba(255,255,255,0.45); }
+
+    /* 설정 패널 */
+    #settings-panel {
+      border-bottom: 1px solid #eee;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #fffaf6;
+    }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .settings-label {
+      font-size: 11px;
+      color: #aaa;
+      width: 30px;
+      flex-shrink: 0;
+    }
+    #cat-name-input {
+      flex: 1;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 12px;
+      outline: none;
+      background: #fff;
+    }
+    #cat-name-input:focus { border-color: #E8883A; }
+    #save-name-btn {
+      background: #E8883A; color: #fff;
+      border: none; border-radius: 6px;
+      padding: 5px 10px; font-size: 11px;
+      cursor: pointer; flex-shrink: 0;
+    }
+    #save-name-btn:hover { background: #d4773a; }
+    #empty-msg {
+      padding: 20px 16px;
+      font-size: 12px;
+      color: #bbb;
+      text-align: center;
+    }
+
+    #task-list { max-height: 300px; overflow-y: auto; }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      padding: 9px 14px;
+      gap: 8px;
+      border-bottom: 1px solid #f5f5f5;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .task-item:hover { background: #fafafa; }
+
+    .task-check {
+      width: 16px; height: 16px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      transition: all 0.15s;
+    }
+    .task-item.done .task-check { background: #E8883A; border-color: #E8883A; color: #fff; }
+
+    .task-time {
+      font-size: 10px;
+      color: #aaa;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .task-item.done .task-time { color: #ccc; }
+
+    .task-name {
+      flex: 1;
+      font-size: 13px;
+      color: #333;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .task-item.done .task-name { text-decoration: line-through; color: #bbb; }
+
+    .badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .badge-active   { color: #2e9e5b; background: #e6f7ee; }
+    .badge-upcoming { color: #E8883A; background: #FEF0E4; }
+
+    .delete-btn {
+      background: none; border: none;
+      color: #ddd; font-size: 15px;
+      cursor: pointer; padding: 0 2px;
+      line-height: 1; flex-shrink: 0;
+    }
+    .delete-btn:hover { color: #f08080; }
+
+    /* 만료(지연) 태스크 */
+    .expired-sep {
+      padding: 6px 14px 4px;
+      font-size: 10px;
+      color: #ccc;
+      background: #fafafa;
+      border-top: 1px solid #f0f0f0;
+      letter-spacing: 0.3px;
+    }
+    .task-item.expired {
+      opacity: 0.55;
+      cursor: default;
+    }
+    .task-item.expired .task-name { color: #aaa; text-decoration: line-through; }
+    .task-item.expired .task-time { color: #ccc; }
+    .badge-expired { color: #d9534f; background: #fff0f0; }
+
+    /* 추가 폼: 2행 레이아웃 */
+    .add-form {
+      border-top: 1px solid #eee;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #fafafa;
+    }
+    .add-row { display: flex; gap: 6px; align-items: center; }
+
+    input[type="text"] {
+      flex: 1;
+      border: 1px solid #e5e5e5;
+      border-radius: 7px;
+      padding: 6px 10px;
+      font-size: 12px;
+      outline: none;
+      background: #fff;
+      color: #333;
+    }
+    input[type="text"]:focus { border-color: #E8883A; }
+
+    input[type="time"] {
+      flex: 1;
+      border: 1px solid #e5e5e5;
+      border-radius: 7px;
+      padding: 6px 8px;
+      font-size: 12px;
+      outline: none;
+      background: #fff;
+      color: #333;
+      cursor: pointer;
+    }
+    input[type="time"]:focus { border-color: #E8883A; }
+
+    .time-sep {
+      font-size: 12px;
+      color: #aaa;
+      flex-shrink: 0;
+    }
+
+    #add-btn {
+      background: #E8883A; color: #fff;
+      border: none; border-radius: 7px;
+      padding: 6px 14px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; flex-shrink: 0;
+    }
+    #add-btn:hover { background: #d4773a; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <header><span>🐱</span> 오늘의 할 일<button id="close-btn">✕</button></header>
+  <div id="settings-panel">
+    <div class="settings-row">
+      <span class="settings-label">이름</span>
+      <input type="text" id="cat-name-input" placeholder="이름 없냥..." maxlength="10" />
+      <button id="save-name-btn">저장</button>
+    </div>
+  </div>
+  <div id="task-list"></div>
+  <div class="add-form">
+    <div class="add-row">
+      <input type="text" id="task-name-input" placeholder="할 일 입력..." maxlength="20" />
+    </div>
+    <div class="add-row">
+      <input type="time" id="task-start-input" />
+      <span class="time-sep">~</span>
+      <input type="time" id="task-end-input" />
+      <button id="add-btn">추가</button>
+    </div>
+  </div>
+  <script src="schedule.js"></script>
+</body>
+</html>

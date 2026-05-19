@@ -1,0 +1,34 @@
+{
+  "name": "desktop-pet",
+  "version": "1.0.0",
+  "description": "Pixel art desktop pet",
+  "author": "hanjiyun",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac dmg"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "canvas": "^3.2.3",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.hanjiyun.desktop-pet",
+    "productName": "Desktop Pet",
+    "mac": {
+      "category": "public.app-category.entertainment",
+      "target": [{ "target": "dmg", "arch": ["universal"] }],
+      "icon": "icon.png"
+    },
+    "files": [
+      "main.js",
+      "renderer.js",
+      "index.html",
+      "tray-icon.png",
+      "sprites/**"
+    ],
+    "extraFiles": []
+  }
+}
