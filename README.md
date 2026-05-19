@@ -56,6 +56,13 @@ npm run build
 └── tray-icon.png    # 메뉴바 트레이 아이콘
 ```
 
+## 설치 시 주의 (macOS Gatekeeper)
+
+코드 서명이 없는 앱이므로 처음 실행 시 경고가 뜰 수 있습니다.
+
+> Finder에서 DMG를 **우클릭 → 열기** 로 설치하거나,
+> 시스템 설정 → 개인정보 보호 및 보안 → **"확인 없이 열기"** 를 클릭하세요.
+
 ## 기술 스택
 
 - [Electron](https://www.electronjs.org/) v28
